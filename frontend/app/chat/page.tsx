@@ -1,12 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
-
-const SITE_NAME = 'AI Traveller Planner'
-const SLOGAN = 'Tell us how you feel—we\'ll plan your perfect journey.'
+import { Send, Sparkles } from 'lucide-react'
+import { useLanguage } from '../contexts/LanguageContext'
 
 export default function ChatPage() {
+  const { t } = useLanguage()
   const [prompt, setPrompt] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -17,30 +16,43 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="min-h-[80vh] flex flex-col items-center px-4 py-12">
-      <Link href="/" className="text-2xl font-bold mb-2" style={{ color: 'rgb(0, 191, 165)' }}>
-        {SITE_NAME}
-      </Link>
-      <p className="text-slate-600 dark:text-slate-400 mb-12 text-center max-w-md">
-        {SLOGAN}
+    <div 
+      className="min-h-[80vh] flex flex-col items-center px-4 py-12"
+      data-testid="chat-page"
+    >
+      <div className="flex items-center gap-3 mb-4">
+        <Sparkles className="w-8 h-8 text-brand" />
+        <h1 
+          className="text-3xl font-bold text-brand"
+          data-testid="chat-title"
+        >
+          {t('chat.title')}
+        </h1>
+      </div>
+      
+      <p className="text-slate-600 mb-12 text-center max-w-md text-lg">
+        {t('chat.slogan')}
       </p>
-      <form onSubmit={handleSubmit} className="w-full max-w-2xl">
-        <div className="relative rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg overflow-hidden focus-within:border-[rgb(0,191,165)] transition-colors">
+      
+      <form onSubmit={handleSubmit} className="w-full max-w-2xl" data-testid="chat-form">
+        <div className="relative rounded-2xl border-2 border-slate-200 bg-white shadow-lg overflow-hidden focus-within:border-brand transition-colors">
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Describe your dream trip, mood, or destination..."
+            placeholder={t('chat.placeholder')}
             rows={4}
-            className="w-full px-6 py-4 bg-transparent text-slate-900 dark:text-white placeholder-slate-400 resize-none focus:outline-none"
+            className="w-full px-6 py-4 bg-transparent text-slate-900 placeholder-slate-400 resize-none focus:outline-none text-lg"
+            data-testid="chat-input"
           />
           <div className="flex justify-end px-4 pb-4">
             <button
               type="submit"
               disabled={!prompt.trim()}
-              className="px-6 py-3 rounded-xl font-semibold text-white transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ backgroundColor: 'rgb(0, 191, 165)' }}
+              className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-brand hover:bg-brand/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              data-testid="chat-submit-button"
             >
-              Generate
+              <Send className="w-5 h-5" />
+              {t('chat.generate')}
             </button>
           </div>
         </div>

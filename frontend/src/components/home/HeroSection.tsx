@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useEffect, useMemo } from 'react'
+import { Sparkles } from 'lucide-react'
 
 const TypewriterEffect = ({ text, delay = 0 }: { text: string; delay?: number }) => {
   const [currentText, setCurrentText] = useState('')
@@ -53,10 +54,14 @@ export const HeroSection = ({
   }
 
   return (
-    <section className="relative h-[62vh] min-h-[400px] flex items-center justify-center overflow-hidden">
+    <section 
+      className="relative h-[65vh] min-h-[450px] flex items-center justify-center overflow-hidden"
+      data-testid="hero-section"
+    >
+      {/* Background */}
       <div
         className="absolute top-0 left-0 right-0 z-0 overflow-hidden"
-        style={{ height: 'calc(50% + 5rem)' }}
+        style={{ height: 'calc(55% + 5rem)' }}
       >
         {backgroundType === 'video' ? (
           <video autoPlay loop muted playsInline className="w-full h-full object-cover">
@@ -65,34 +70,41 @@ export const HeroSection = ({
         ) : (
           <img src={backgroundSrc} alt="Hero Background" className="w-full h-full object-cover" />
         )}
-        <div className="absolute inset-0 bg-black/60 dark:bg-black/70" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/60 to-black/70" />
       </div>
 
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-16 py-20">
-        <div className="max-w-5xl mx-auto text-center space-y-8 mb-8">
+      {/* Content */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-16 py-24">
+        <div className="max-w-4xl mx-auto text-center space-y-8">
+          {/* Main Title */}
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-tight min-h-[1.2em]">
             <span className="text-white inline mr-3">
               <TypewriterEffect text={line1Text} />
             </span>
-            <span className="bg-gradient-to-r from-sky-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent inline">
+            <span className="bg-gradient-to-r from-brand via-emerald-400 to-cyan-400 bg-clip-text text-transparent inline">
               <TypewriterEffect text={line2Text} delay={line1Duration} />
             </span>
           </h1>
+
+          {/* Subtitle */}
           <div
-            className="text-xl sm:text-2xl text-white font-semibold leading-relaxed max-w-3xl mx-auto"
+            className="text-xl sm:text-2xl text-white/90 font-medium leading-relaxed max-w-3xl mx-auto"
             style={{ minHeight: calculateMinHeight(subtitleText) }}
           >
             <p className="m-0">
               <TypewriterEffect text={subtitleText} delay={subtitleDelay} />
             </p>
           </div>
-          <div className="pt-4">
+
+          {/* CTA Button */}
+          <div className="pt-6">
             <Link
               href="/chat"
-              className="inline-flex items-center justify-center px-8 py-4 rounded-xl font-semibold text-white transition-all duration-300"
-              style={{ backgroundColor: 'rgb(0, 191, 165)' }}
+              className="group inline-flex items-center justify-center gap-3 px-10 py-5 rounded-2xl font-bold text-lg text-white bg-brand hover:bg-brand/90 shadow-lg shadow-brand/30 hover:shadow-xl hover:shadow-brand/40 transition-all duration-300 hover:scale-105"
+              data-testid="hero-cta-button"
             >
-              Start with AI Chat
+              <Sparkles className="w-6 h-6 group-hover:animate-pulse" />
+              {t('hero.cta')}
             </Link>
           </div>
         </div>

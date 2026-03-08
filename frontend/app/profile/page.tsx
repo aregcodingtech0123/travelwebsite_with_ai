@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
+import { CreditCard, User } from 'lucide-react'
+import { useLanguage } from '../contexts/LanguageContext'
 
-const SITE_NAME = 'AI Traveller Planner'
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
 
 export default function ProfilePage() {
+  const { t } = useLanguage()
   const { data: session, status } = useSession()
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
@@ -51,9 +53,9 @@ export default function ProfilePage() {
         body: JSON.stringify({ email, name, surname }),
       })
       if (!res.ok) throw new Error('Update failed')
-      setMessage('Profile updated')
+      setMessage(t('profile.updated'))
     } catch {
-      setMessage('Update failed')
+      setMessage(t('profile.updateFailed'))
     } finally {
       setLoading(false)
     }
@@ -62,7 +64,7 @@ export default function ProfilePage() {
   if (status === 'loading') {
     return (
       <div className="min-h-[80vh] flex items-center justify-center">
-        <p className="text-slate-600">Loading...</p>
+        <p className="text-slate-600">{t('profile.loading')}</p>
       </div>
     )
   }
@@ -70,58 +72,93 @@ export default function ProfilePage() {
   if (!session) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center">
-        <p className="text-slate-600">Please log in to view your profile.</p>
+        <p className="text-slate-600">{t('profile.loginRequired')}</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-[80vh] px-4 py-12 max-w-xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8" style={{ color: 'rgb(0, 191, 165)' }}>
-        {SITE_NAME} — Profile
-      </h1>
+    <div 
+      className="min-h-[80vh] px-4 py-12 max-w-xl mx-auto"
+      data-testid="profile-page"
+    >
+      <div className="flex items-center gap-3 mb-8">
+        <User className="w-8 h-8 text-brand" />
+        <h1 className="text-3xl font-bold text-brand" data-testid="profile-title">
+          {t('profile.title')}
+        </h1>
+      </div>
+      
       {creditAmount !== null && (
-        <div className="mb-8 p-4 rounded-xl bg-slate-100 dark:bg-slate-800">
-          <p className="text-sm text-slate-500 dark:text-slate-400">Credit Amount</p>
-          <p className="text-2xl font-bold text-slate-900 dark:text-white">{creditAmount}</p>
+        <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-brand/10 to-brand/5 border border-brand/20" data-testid="profile-credit-section">
+          <div className="flex items-center gap-3 mb-2">
+            <CreditCard className="w-5 h-5 text-brand" />
+            <p className="text-sm font-medium text-slate-600">{t('profile.credit')}</p>
+          </div>
+          <p className="text-3xl font-bold text-slate-900">${creditAmount.toFixed(2)}</p>
         </div>
       )}
-      <form onSubmit={handleSubmit} className="space-y-6">
+      
+      <form onSubmit={handleSubmit} className="space-y-6" data-testid="profile-form">
         <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Email</label>
+          <label className="block text-sm font-medium text-slate-700 mb-2">
+            {t('profile.email')}
+          </label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+            className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand focus:border-transparent transition-all"
+            data-testid="profile-email-input"
           />
         </div>
+        
         <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Name</label>
+          <label className="block text-sm font-medium text-slate-700 mb-2">
+            {t('profile.name')}
+          </label>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+            className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand focus:border-transparent transition-all"
+            data-testid="profile-name-input"
           />
         </div>
+        
         <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Surname</label>
+          <label className="block text-sm font-medium text-slate-700 mb-2">
+            {t('profile.surname')}
+          </label>
           <input
             type="text"
             value={surname}
             onChange={(e) => setSurname(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+            className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand focus:border-transparent transition-all"
+            data-testid="profile-surname-input"
           />
         </div>
-        {message && <p className="text-sm text-slate-600 dark:text-slate-400">{message}</p>}
+        
+        {message && (
+          <p 
+            className={`text-sm px-4 py-2 rounded-lg ${
+              message.includes(t('profile.updated')) 
+                ? 'text-green-700 bg-green-50' 
+                : 'text-red-600 bg-red-50'
+            }`}
+            data-testid="profile-message"
+          >
+            {message}
+          </p>
+        )}
+        
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 rounded-lg font-semibold text-white disabled:opacity-50"
-          style={{ backgroundColor: 'rgb(0, 191, 165)' }}
+          className="w-full py-3.5 rounded-xl font-semibold text-white bg-brand hover:bg-brand/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          data-testid="profile-save-button"
         >
-          {loading ? 'Saving...' : 'Save'}
+          {loading ? t('profile.saving') : t('profile.save')}
         </button>
       </form>
     </div>

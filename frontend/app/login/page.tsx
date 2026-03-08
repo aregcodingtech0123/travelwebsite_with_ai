@@ -4,10 +4,10 @@ import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
-
-const SITE_NAME = 'AI Traveller Planner'
+import { useLanguage } from '../contexts/LanguageContext'
 
 function LoginForm() {
+  const { t } = useLanguage()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -27,13 +27,13 @@ function LoginForm() {
         redirect: false,
       })
       if (res?.error) {
-        setError('Invalid email or password')
+        setError(t('login.error.invalid'))
         return
       }
       router.push(callbackUrl)
       router.refresh()
     } catch {
-      setError('Something went wrong')
+      setError(t('login.error.generic'))
     } finally {
       setLoading(false)
     }
@@ -45,13 +45,20 @@ function LoginForm() {
 
   return (
     <div className="w-full max-w-md">
-      <h1 className="text-3xl font-bold text-center mb-8" style={{ color: 'rgb(0, 191, 165)' }}>
-        {SITE_NAME}
+      <h1 
+        className="text-3xl font-bold text-center mb-8 text-brand"
+        data-testid="login-title"
+      >
+        {t('login.title')}
       </h1>
-      <form onSubmit={handleSubmit} className="space-y-6">
+      
+      <form onSubmit={handleSubmit} className="space-y-6" data-testid="login-form">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-            Email
+          <label 
+            htmlFor="email" 
+            className="block text-sm font-medium text-slate-700 mb-2"
+          >
+            {t('login.email')}
           </label>
           <input
             id="email"
@@ -59,13 +66,18 @@ function LoginForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-[rgb(0,191,165)] focus:border-transparent"
-            placeholder="you@example.com"
+            className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand focus:border-transparent transition-all"
+            placeholder={t('login.email.placeholder')}
+            data-testid="login-email-input"
           />
         </div>
+        
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-            Password
+          <label 
+            htmlFor="password" 
+            className="block text-sm font-medium text-slate-700 mb-2"
+          >
+            {t('login.password')}
           </label>
           <input
             id="password"
@@ -73,33 +85,45 @@ function LoginForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-[rgb(0,191,165)] focus:border-transparent"
-            placeholder="••••••••"
+            className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand focus:border-transparent transition-all"
+            placeholder={t('login.password.placeholder')}
+            data-testid="login-password-input"
           />
         </div>
+        
         {error && (
-          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          <p className="text-sm text-red-600 bg-red-50 px-4 py-2 rounded-lg" data-testid="login-error">
+            {error}
+          </p>
         )}
+        
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 rounded-lg font-semibold text-white transition-opacity disabled:opacity-50"
-          style={{ backgroundColor: 'rgb(0, 191, 165)' }}
+          className="w-full py-3.5 rounded-xl font-semibold text-white bg-brand hover:bg-brand/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          data-testid="login-submit-button"
         >
-          {loading ? 'Signing in...' : 'Log In'}
+          {loading ? t('login.loading') : t('login.submit')}
         </button>
+        
         <button
           type="button"
           onClick={handleGoogle}
-          className="w-full py-3 rounded-lg font-semibold border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+          className="w-full py-3.5 rounded-xl font-semibold border-2 border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors"
+          data-testid="login-google-button"
         >
-          Login with Google
+          {t('login.google')}
         </button>
       </form>
-      <p className="mt-6 text-center text-slate-600 dark:text-slate-400">
-        Don&apos;t you have an account?{' '}
-        <Link href="/register" className="font-medium underline" style={{ color: 'rgb(0, 191, 165)' }}>
-          Register from here
+      
+      <p className="mt-8 text-center text-slate-600">
+        {t('login.noAccount')}{' '}
+        <Link 
+          href="/register" 
+          className="font-semibold text-brand hover:underline"
+          data-testid="login-register-link"
+        >
+          {t('login.register')}
         </Link>
       </p>
     </div>
@@ -107,9 +131,14 @@ function LoginForm() {
 }
 
 export default function LoginPage() {
+  const { t } = useLanguage()
+  
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
-      <Suspense fallback={<div className="text-center text-slate-600">Loading...</div>}>
+    <div 
+      className="min-h-[80vh] flex items-center justify-center px-4 py-12"
+      data-testid="login-page"
+    >
+      <Suspense fallback={<div className="text-center text-slate-600">{t('profile.loading')}</div>}>
         <LoginForm />
       </Suspense>
     </div>

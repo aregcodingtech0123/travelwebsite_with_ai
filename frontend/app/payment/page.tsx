@@ -2,10 +2,13 @@
 
 import { useState, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
+import { CreditCard } from 'lucide-react'
+import { useLanguage } from '../contexts/LanguageContext'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
 
 export default function PaymentPage() {
+  const { t } = useLanguage()
   const { data: session, status } = useSession()
   const [cardNumber, setCardNumber] = useState('')
   const [expiry, setExpiry] = useState('')
@@ -38,12 +41,12 @@ export default function PaymentPage() {
     e.preventDefault()
     setMessage('')
     if (!session?.user?.id) {
-      setMessage('Please log in')
+      setMessage(t('payment.loginRequired'))
       return
     }
     const numAmount = parseFloat(amount)
     if (isNaN(numAmount) || numAmount <= 0) {
-      setMessage('Enter a valid amount')
+      setMessage(t('payment.invalidAmount'))
       return
     }
     setLoading(true)
@@ -59,14 +62,14 @@ export default function PaymentPage() {
         }),
       })
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.error ?? 'Payment failed')
-      setMessage('Payment successful')
+      if (!res.ok) throw new Error(data.error ?? t('payment.failed'))
+      setMessage(t('payment.success'))
       setCardNumber('')
       setExpiry('')
       setCvv('')
       setAmount('')
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : 'Payment failed')
+      setMessage(err instanceof Error ? err.message : t('payment.failed'))
     } finally {
       setLoading(false)
     }
@@ -75,7 +78,7 @@ export default function PaymentPage() {
   if (status === 'loading') {
     return (
       <div className="min-h-[80vh] flex items-center justify-center">
-        <p className="text-slate-600">Loading...</p>
+        <p className="text-slate-600">{t('payment.loading')}</p>
       </div>
     )
   }
@@ -83,76 +86,106 @@ export default function PaymentPage() {
   if (!session) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center">
-        <p className="text-slate-600">Please log in to make a payment.</p>
+        <p className="text-slate-600">{t('payment.loginRequired')}</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-[80vh] px-4 py-12 max-w-md mx-auto">
-      <h1 className="text-3xl font-bold mb-8" style={{ color: 'rgb(0, 191, 165)' }}>
-        Add Credit
-      </h1>
-      <form onSubmit={handleSubmit} className="space-y-6">
+    <div 
+      className="min-h-[80vh] px-4 py-12 max-w-md mx-auto"
+      data-testid="payment-page"
+    >
+      <div className="flex items-center gap-3 mb-8">
+        <CreditCard className="w-8 h-8 text-brand" />
+        <h1 className="text-3xl font-bold text-brand" data-testid="payment-title">
+          {t('payment.title')}
+        </h1>
+      </div>
+      
+      <form onSubmit={handleSubmit} className="space-y-6" data-testid="payment-form">
         <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Card Number</label>
+          <label className="block text-sm font-medium text-slate-700 mb-2">
+            {t('payment.cardNumber')}
+          </label>
           <input
             type="text"
             inputMode="numeric"
             value={cardNumber}
             onChange={handleCardChange}
-            placeholder="1234 5678 9012 3456"
-            className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+            placeholder={t('payment.cardNumber.placeholder')}
+            className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand focus:border-transparent transition-all"
+            data-testid="payment-card-input"
           />
         </div>
+        
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Expiry (MM/YY)</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              {t('payment.expiry')}
+            </label>
             <input
               type="text"
               inputMode="numeric"
               value={expiry}
               onChange={handleExpiryChange}
-              placeholder="MM/YY"
-              className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+              placeholder={t('payment.expiry.placeholder')}
+              className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand focus:border-transparent transition-all"
+              data-testid="payment-expiry-input"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">CVV (3 digits)</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              {t('payment.cvv')}
+            </label>
             <input
               type="text"
               inputMode="numeric"
               value={cvv}
               onChange={handleCvvChange}
-              placeholder="123"
+              placeholder={t('payment.cvv.placeholder')}
               maxLength={3}
-              className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+              className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand focus:border-transparent transition-all"
+              data-testid="payment-cvv-input"
             />
           </div>
         </div>
+        
         <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Amount</label>
+          <label className="block text-sm font-medium text-slate-700 mb-2">
+            {t('payment.amount')}
+          </label>
           <input
             type="number"
             min="1"
             step="0.01"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+            className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand focus:border-transparent transition-all"
+            data-testid="payment-amount-input"
           />
         </div>
+        
         {message && (
-          <p className={`text-sm ${message.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
+          <p 
+            className={`text-sm px-4 py-2 rounded-lg ${
+              message.includes(t('payment.success')) 
+                ? 'text-green-700 bg-green-50' 
+                : 'text-red-600 bg-red-50'
+            }`}
+            data-testid="payment-message"
+          >
             {message}
           </p>
         )}
+        
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 rounded-lg font-semibold text-white disabled:opacity-50"
-          style={{ backgroundColor: 'rgb(0, 191, 165)' }}
+          className="w-full py-3.5 rounded-xl font-semibold text-white bg-brand hover:bg-brand/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          data-testid="payment-submit-button"
         >
-          {loading ? 'Processing...' : 'Pay'}
+          {loading ? t('payment.processing') : t('payment.pay')}
         </button>
       </form>
     </div>
