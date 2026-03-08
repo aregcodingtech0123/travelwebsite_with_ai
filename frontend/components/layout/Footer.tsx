@@ -1,16 +1,19 @@
 'use client'
 
 import Link from 'next/link'
-import { Instagram, Facebook, MapPin, Mail } from 'lucide-react'
+import { Instagram, Facebook, MapPin, Mail, Plane } from 'lucide-react'
 import { useLanguage } from '@/app/contexts/LanguageContext'
 
 export function Footer() {
   const { t } = useLanguage()
 
-  const footerLinks = [
+  const quickLinks = [
     { href: '/about', labelKey: 'footer.about' },
     { href: '/destinations', labelKey: 'footer.destinations' },
     { href: '/contact', labelKey: 'footer.contact' },
+  ]
+
+  const legalLinks = [
     { href: '/privacy', labelKey: 'footer.privacy' },
     { href: '/terms', labelKey: 'footer.terms' },
   ]
@@ -20,45 +23,28 @@ export function Footer() {
       className="mt-auto text-white"
       style={{ backgroundColor: 'rgb(0, 191, 165)' }}
       data-testid="footer"
+      role="contentinfo"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 mb-10">
           {/* Brand Section */}
-          <div className="text-center md:text-left">
-            <Link href="/" className="inline-flex items-center gap-2 mb-3">
-              <MapPin className="w-6 h-6" />
-              <span className="font-bold text-xl">{t('site.name')}</span>
+          <div className="lg:col-span-2">
+            <Link href="/" className="inline-flex items-center gap-2 mb-4">
+              <Plane className="w-7 h-7" />
+              <span className="font-heading font-bold text-2xl">{t('site.name')}</span>
             </Link>
-            <p className="text-white/80 text-sm max-w-xs mx-auto md:mx-0">
+            <p className="font-body text-white/80 text-base max-w-md leading-relaxed">
               {t('footer.tagline')}
             </p>
-          </div>
-
-          {/* Quick Links */}
-          <div className="text-center">
-            <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-              {footerLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-white/90 hover:text-white text-sm font-medium transition-colors hover:underline underline-offset-4"
-                  data-testid={`footer-link-${link.labelKey.split('.')[1]}`}
-                >
-                  {t(link.labelKey)}
-                </Link>
-              ))}
-            </nav>
-          </div>
-
-          {/* Social & Contact */}
-          <div className="text-center md:text-right">
-            <div className="flex items-center justify-center md:justify-end gap-4 mb-3">
+            
+            {/* Social Links */}
+            <div className="flex items-center gap-3 mt-6">
               <a
                 href="https://www.instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                className="p-3 rounded-full bg-white/10 hover:bg-white hover:text-brand transition-all duration-300"
                 aria-label={t('footer.social.instagram')}
                 data-testid="social-instagram"
               >
@@ -68,16 +54,55 @@ export function Footer() {
                 href="https://www.facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                className="p-3 rounded-full bg-white/10 hover:bg-white hover:text-brand transition-all duration-300"
                 aria-label={t('footer.social.facebook')}
                 data-testid="social-facebook"
               >
                 <Facebook className="w-5 h-5" />
               </a>
             </div>
+          </div>
+
+          {/* Quick Links */}
+          <nav aria-label="Quick links">
+            <h3 className="font-heading font-semibold text-lg mb-4">Quick Links</h3>
+            <ul className="space-y-3">
+              {quickLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="font-body text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group"
+                    data-testid={`footer-link-${link.labelKey.split('.')[1]}`}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/50 group-hover:bg-white transition-colors" />
+                    {t(link.labelKey)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {/* Legal & Contact */}
+          <div>
+            <h3 className="font-heading font-semibold text-lg mb-4">Legal</h3>
+            <ul className="space-y-3 mb-6">
+              {legalLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="font-body text-white/80 hover:text-white transition-colors inline-flex items-center gap-2 group"
+                    data-testid={`footer-link-${link.labelKey.split('.')[1]}`}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/50 group-hover:bg-white transition-colors" />
+                    {t(link.labelKey)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            
             <a 
               href="mailto:contact@ai-traveller-planner.example.com"
-              className="inline-flex items-center gap-2 text-white/80 hover:text-white text-sm transition-colors"
+              className="inline-flex items-center gap-2 text-white/80 hover:text-white text-sm transition-colors font-body"
             >
               <Mail className="w-4 h-4" />
               <span>contact@ai-traveller-planner.example.com</span>
@@ -86,8 +111,8 @@ export function Footer() {
         </div>
 
         {/* Divider */}
-        <div className="border-t border-white/20 pt-6">
-          <p className="text-center text-white/70 text-sm">
+        <div className="border-t border-white/20 pt-8">
+          <p className="text-center text-white/70 text-sm font-body">
             {t('footer.copyright')}
           </p>
         </div>

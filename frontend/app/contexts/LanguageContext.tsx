@@ -115,6 +115,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'destinations.popular.prev': 'Previous destinations',
     'destinations.popular.next': 'Next destinations',
     'destinations.popular.page': 'Go to page',
+    'destinations.seeMore': 'See All Destinations',
     
     // Hidden Gems
     'hiddenGems.title': 'Hidden Gems',
@@ -122,6 +123,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'hiddenGems.prev': 'Previous',
     'hiddenGems.next': 'Next',
     'hiddenGems.page': 'Page',
+    'hiddenGems.seeMore': 'Explore More Gems',
     
     // Benefits
     'benefits.title': 'Benefits of Travel',
@@ -297,6 +299,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'destinations.popular.prev': 'Önceki destinasyonlar',
     'destinations.popular.next': 'Sonraki destinasyonlar',
     'destinations.popular.page': 'Sayfaya git',
+    'destinations.seeMore': 'Tüm Destinasyonları Gör',
     
     // Hidden Gems
     'hiddenGems.title': 'Gizli Hazineler',
@@ -304,6 +307,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'hiddenGems.prev': 'Önceki',
     'hiddenGems.next': 'Sonraki',
     'hiddenGems.page': 'Sayfa',
+    'hiddenGems.seeMore': 'Daha Fazla Keşfet',
     
     // Benefits
     'benefits.title': 'Seyahatin Faydaları',
@@ -479,6 +483,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'destinations.popular.prev': 'Vorherige Reiseziele',
     'destinations.popular.next': 'Nächste Reiseziele',
     'destinations.popular.page': 'Zur Seite gehen',
+    'destinations.seeMore': 'Alle Reiseziele anzeigen',
     
     // Hidden Gems
     'hiddenGems.title': 'Geheimtipps',
@@ -486,6 +491,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'hiddenGems.prev': 'Zurück',
     'hiddenGems.next': 'Weiter',
     'hiddenGems.page': 'Seite',
+    'hiddenGems.seeMore': 'Mehr entdecken',
     
     // Benefits
     'benefits.title': 'Vorteile des Reisens',
@@ -661,6 +667,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'destinations.popular.prev': 'Destinos anteriores',
     'destinations.popular.next': 'Siguientes destinos',
     'destinations.popular.page': 'Ir a página',
+    'destinations.seeMore': 'Ver todos los destinos',
     
     // Hidden Gems
     'hiddenGems.title': 'Joyas Ocultas',
@@ -668,6 +675,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'hiddenGems.prev': 'Anterior',
     'hiddenGems.next': 'Siguiente',
     'hiddenGems.page': 'Página',
+    'hiddenGems.seeMore': 'Explorar más joyas',
     
     // Benefits
     'benefits.title': 'Beneficios de Viajar',
@@ -843,6 +851,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'destinations.popular.prev': 'Destinations précédentes',
     'destinations.popular.next': 'Destinations suivantes',
     'destinations.popular.page': 'Aller à la page',
+    'destinations.seeMore': 'Voir toutes les destinations',
     
     // Hidden Gems
     'hiddenGems.title': 'Trésors Cachés',
@@ -850,6 +859,7 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
     'hiddenGems.prev': 'Précédent',
     'hiddenGems.next': 'Suivant',
     'hiddenGems.page': 'Page',
+    'hiddenGems.seeMore': 'Découvrir plus de trésors',
     
     // Benefits
     'benefits.title': 'Avantages du Voyage',

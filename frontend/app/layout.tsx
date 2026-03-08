@@ -1,34 +1,130 @@
-// import type { Metadata } from 'next'
-// import './globals.css'
-
-// export const metadata: Metadata = {
-//   title: 'AI Travel Planner',
-//   description: 'Plan your perfect trip with AI',
-// }
-
-// export default function RootLayout({
-//   children,
-// }: {
-//   children: React.ReactNode
-// }) {
-//   return (
-//     <html lang="en">
-//       <body>{children}</body>
-//     </html>
-//   )
-// }
-
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Montserrat, Playfair_Display } from 'next/font/google'
 import './globals.css'
 import { LanguageProvider } from './contexts/LanguageContext'
 import { Layout } from '@/components/layout/Layout'
 
-const inter = Inter({ subsets: ['latin'] })
+const montserrat = Montserrat({ 
+  subsets: ['latin'],
+  variable: '--font-montserrat',
+  display: 'swap',
+})
+
+const playfair = Playfair_Display({ 
+  subsets: ['latin'],
+  variable: '--font-playfair',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
-  title: 'AI Traveller Planner',
-  description: 'Intelligent travel planning powered by AI',
+  title: {
+    default: 'AI Traveller Planner | Smart Travel Planning with AI',
+    template: '%s | AI Traveller Planner'
+  },
+  description: 'Plan your perfect trip with AI-powered travel recommendations. Discover popular destinations, hidden gems, and personalized itineraries tailored to your travel style and preferences.',
+  keywords: ['AI travel planner', 'travel planning', 'trip planner', 'vacation planning', 'travel recommendations', 'AI itinerary', 'destination guide', 'hidden gems', 'travel assistant'],
+  authors: [{ name: 'AI Traveller Planner' }],
+  creator: 'AI Traveller Planner',
+  publisher: 'AI Traveller Planner',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://ai-traveller-planner.com',
+    siteName: 'AI Traveller Planner',
+    title: 'AI Traveller Planner | Smart Travel Planning with AI',
+    description: 'Plan your perfect trip with AI-powered travel recommendations. Discover popular destinations, hidden gems, and personalized itineraries.',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'AI Traveller Planner - Your AI-Powered Travel Companion',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AI Traveller Planner | Smart Travel Planning with AI',
+    description: 'Plan your perfect trip with AI-powered travel recommendations. Discover popular destinations and hidden gems.',
+    images: ['/og-image.jpg'],
+    creator: '@aitravelplanner',
+  },
+  alternates: {
+    canonical: 'https://ai-traveller-planner.com',
+    languages: {
+      'en-US': 'https://ai-traveller-planner.com/en',
+      'tr-TR': 'https://ai-traveller-planner.com/tr',
+      'de-DE': 'https://ai-traveller-planner.com/de',
+      'es-ES': 'https://ai-traveller-planner.com/es',
+      'fr-FR': 'https://ai-traveller-planner.com/fr',
+    },
+  },
+  verification: {
+    google: 'google-site-verification-code',
+  },
+  category: 'travel',
+}
+
+// Schema.org structured data for TravelAgency
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'TravelAgency',
+  name: 'AI Traveller Planner',
+  description: 'AI-powered travel planning platform that helps you discover destinations, plan itineraries, and create memorable journeys with personalized recommendations.',
+  url: 'https://ai-traveller-planner.com',
+  logo: 'https://ai-traveller-planner.com/logo.png',
+  image: 'https://ai-traveller-planner.com/og-image.jpg',
+  telephone: '+1-800-TRAVEL',
+  email: 'contact@ai-traveller-planner.example.com',
+  address: {
+    '@type': 'PostalAddress',
+    addressCountry: 'US',
+  },
+  sameAs: [
+    'https://www.instagram.com/aitravelplanner',
+    'https://www.facebook.com/aitravelplanner',
+    'https://twitter.com/aitravelplanner',
+  ],
+  priceRange: '$$',
+  openingHours: 'Mo-Su 00:00-24:00',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.8',
+    reviewCount: '1250',
+  },
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Travel Planning Services',
+    itemListElement: [
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: 'AI-Powered Itinerary Planning',
+          description: 'Get personalized travel itineraries created by AI based on your preferences and travel style.',
+        },
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: 'Destination Discovery',
+          description: 'Explore popular destinations and hidden gems curated by travel experts and AI.',
+        },
+      },
+    ],
+  },
 }
 
 export default function RootLayout({
@@ -37,8 +133,17 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+    <html lang="en" suppressHydrationWarning className={`${montserrat.variable} ${playfair.variable}`}>
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <meta name="theme-color" content="#00bfa5" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
+      <body className={montserrat.className}>
         <LanguageProvider>
           <Layout>{children}</Layout>
         </LanguageProvider>

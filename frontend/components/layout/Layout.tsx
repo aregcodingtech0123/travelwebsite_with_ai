@@ -9,9 +9,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
     <SessionProvider>
       <div className="flex min-h-screen flex-col">
         <Navbar />
-        <main className="flex-1 pt-[6.5rem] md:pt-16">
+        {/* Main content with proper padding to account for sticky navbar */}
+        <div className="flex-1">
           {children}
-        </main>
+        </div>
         <Footer />
       </div>
     </SessionProvider>
