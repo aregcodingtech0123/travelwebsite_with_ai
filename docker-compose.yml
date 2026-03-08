@@ -1,0 +1,82 @@
+services:
+  db:
+    build:
+      context: .
+      dockerfile: db.Dockerfile
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+      POSTGRES_DB: ${DB_NAME:-ai_planner_db}
+      # Security: Disable "trust" and use encrypted passwords
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+      POSTGRES_INITDB_ARGS: "--auth-local=scram-sha-256 --auth-host=scram-sha-256"
+      # Locale Fix
+      LANG: en_US.utf8
+      LC_ALL: en_US.utf8
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -q"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: "postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-password}@db:5432/${DB_NAME:-ai_planner_db}?schema=public"
+      AI_SERVICE_URL: "http://ai-service:5000"
+      PORT: 8080
+    depends_on:
+      db:
+        condition: service_healthy
+
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./ai-service/.env
+    environment:
+      - PORT=5000
+    # GOOGLE_API_KEY, GEMINI_MODEL, IPINFO_TOKEN, USE_MOCK come from ai-service/.env (copy from ai-service/.env.example)
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: "http://localhost:8080"
+      BACKEND_URL: "http://backend:8080"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
+    tty: true
+    stdin_open: true
+
+volumes:
+  postgres_data:

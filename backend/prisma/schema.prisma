@@ -1,0 +1,64 @@
+// AI Traveller Planner - PostgreSQL Schema
+// Run: npx prisma generate && npx prisma migrate dev
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  name         String
+  surname      String
+  email        String    @unique
+  password     String?   // null when using OAuth only
+  creditAmount Float     @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  chatHistories ChatHistory[]
+  payments      Payment[]
+}
+
+model ChatHistory {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content   String   @db.Text // JSON string of messages [{ role, content }]
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Payment {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount    Float
+  date      DateTime @default(now())
+  status    String   // e.g. "completed", "pending", "failed"
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([date])
+}
+
+// Logger: Record user actions for audit trail
+model ActionLog {
+  id        String   @id @default(uuid())
+  userId    String?  // null for anonymous actions
+  action    String   // e.g. "login", "logout", "chat_send", "payment_init"
+  details   String?  @db.Text // JSON optional payload
+  ip        String?
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
