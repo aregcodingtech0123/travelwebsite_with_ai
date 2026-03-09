@@ -20,7 +20,7 @@ export function HiddenGemsSection() {
     <section 
       className="relative py-24 md:py-32 px-6 md:px-12 lg:px-16 bg-white"
       data-testid="hidden-gems-section"
-      aria-label="Hidden gems destinations"
+      aria-label={t('hiddenGems.title')}
     >
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
@@ -60,7 +60,7 @@ export function HiddenGemsSection() {
                   animationDelay: `${idx * 0.1}s`,
                 }}
                 data-testid={`hidden-gem-card-${gem.id}`}
-                aria-label={`Discover ${gem.name}`}
+                aria-label={t('hiddenGems.card.' + gem.id)}
               >
                 <div
                   className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
@@ -75,7 +75,7 @@ export function HiddenGemsSection() {
                     {gem.name}
                   </h3>
                   <p className="font-body text-base md:text-lg text-white/90 leading-relaxed opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-24 transition-all duration-500 overflow-hidden">
-                    {gem.description}
+                    {t('hiddenGems.card.' + gem.id) || gem.description}
                   </p>
                   
                   {/* Animated line on hover */}

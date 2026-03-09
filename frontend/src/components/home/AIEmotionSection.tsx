@@ -11,7 +11,7 @@ export function AIEmotionSection() {
     <section 
       className="py-24 md:py-32 px-6 md:px-12 lg:px-16 bg-professional"
       data-testid="ai-emotion-section"
-      aria-label="AI travel planning features"
+      aria-label={t('aiEmotion.title')}
     >
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
         {/* Image */}

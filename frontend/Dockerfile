@@ -26,6 +26,9 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/node_modules ./node_modules
 
+# Minimal tools for healthchecks / debugging
+RUN apk add --no-cache curl
+
 EXPOSE 3000
 
 CMD ["npm", "start"]

@@ -49,7 +49,7 @@ function LoginForm() {
         className="text-3xl font-bold text-center mb-8 text-brand"
         data-testid="login-title"
       >
-        {t('login.title')}
+        {t('auth.login.title')}
       </h1>
       
       <form onSubmit={handleSubmit} className="space-y-6" data-testid="login-form">
@@ -58,7 +58,7 @@ function LoginForm() {
             htmlFor="email" 
             className="block text-sm font-medium text-slate-700 mb-2"
           >
-            {t('login.email')}
+            {t('auth.email')}
           </label>
           <input
             id="email"
@@ -67,7 +67,7 @@ function LoginForm() {
             onChange={(e) => setEmail(e.target.value)}
             required
             className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand focus:border-transparent transition-all"
-            placeholder={t('login.email.placeholder')}
+            placeholder={t('auth.placeholders.email')}
             data-testid="login-email-input"
           />
         </div>
@@ -77,7 +77,7 @@ function LoginForm() {
             htmlFor="password" 
             className="block text-sm font-medium text-slate-700 mb-2"
           >
-            {t('login.password')}
+            {t('auth.password')}
           </label>
           <input
             id="password"
@@ -86,7 +86,7 @@ function LoginForm() {
             onChange={(e) => setPassword(e.target.value)}
             required
             className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand focus:border-transparent transition-all"
-            placeholder={t('login.password.placeholder')}
+            placeholder={t('auth.placeholders.password')}
             data-testid="login-password-input"
           />
         </div>
@@ -112,18 +112,18 @@ function LoginForm() {
           className="w-full py-3.5 rounded-xl font-semibold border-2 border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors"
           data-testid="login-google-button"
         >
-          {t('login.google')}
+          {t('auth.googleLogin')}
         </button>
       </form>
       
       <p className="mt-8 text-center text-slate-600">
-        {t('login.noAccount')}{' '}
+        {t('auth.noAccount')}{' '}
         <Link 
           href="/register" 
           className="font-semibold text-brand hover:underline"
           data-testid="login-register-link"
         >
-          {t('login.register')}
+          {t('auth.haveAccount')}
         </Link>
       </p>
     </div>

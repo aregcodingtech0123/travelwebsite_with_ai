@@ -18,7 +18,7 @@ export default function AboutPage() {
         </h1>
       </div>
       <p className="text-lg text-slate-600 leading-relaxed">
-        {t('about.text')}
+        {t('about.description')}
       </p>
     </div>
   )

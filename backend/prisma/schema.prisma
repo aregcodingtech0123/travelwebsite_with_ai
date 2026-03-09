@@ -12,8 +12,13 @@ datasource db {
 
 model User {
   id           String    @id @default(uuid())
+  // Legacy fields (kept for backward compatibility)
   name         String
   surname      String
+
+  // New structured name fields
+  firstName    String?
+  lastName     String?
   email        String    @unique
   password     String?   // null when using OAuth only
   creditAmount Float     @default(0)

@@ -9,7 +9,7 @@ export function BenefitsSection() {
     <section 
       className="py-24 md:py-32 px-6 md:px-12 lg:px-16 bg-professional"
       data-testid="benefits-section"
-      aria-label="Benefits of travel"
+      aria-label={t('benefits.title')}
     >
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
         {/* Image */}

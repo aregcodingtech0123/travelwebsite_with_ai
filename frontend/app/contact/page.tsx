@@ -27,10 +27,10 @@ export default function ContactPage() {
         <div>
           <p className="text-sm font-medium text-slate-500">{t('contact.email')}</p>
           <a 
-            href="mailto:contact@ai-traveller-planner.example.com"
+            href="mailto:support@aeroute.ai"
             className="text-brand hover:underline"
           >
-            contact@ai-traveller-planner.example.com
+            support@aeroute.ai
           </a>
         </div>
       </div>

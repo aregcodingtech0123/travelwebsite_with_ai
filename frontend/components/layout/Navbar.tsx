@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
-import { Menu, User, LogOut, Globe, ChevronDown, Plane } from 'lucide-react'
+import { Menu, User, LogOut, Globe, ChevronDown, Plane, Search } from 'lucide-react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { Sidebar } from './Sidebar'
 import { useLanguage, languageMetadata, LanguageCode } from '@/app/contexts/LanguageContext'
@@ -13,12 +14,84 @@ export function Navbar() {
   const { language, setLanguage, t } = useLanguage()
   const [scrolled, setScrolled] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<
+    { label: string; value: string }[]
+  >([])
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [searchLoading, setSearchLoading] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  // Debounced location search
+  useEffect(() => {
+    if (!searchQuery || searchQuery.trim().length < 2) {
+      setSearchResults([])
+      return
+    }
+
+    const controller = new AbortController()
+    const timeoutId = setTimeout(async () => {
+      try {
+        setSearchLoading(true)
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          searchQuery.trim(),
+        )}&addressdetails=1&limit=5`
+        const res = await fetch(url, {
+          signal: controller.signal,
+          headers: {
+            // Nominatim requires an identifying header; this is a simple app identifier
+            'Accept-Language': language,
+          },
+        })
+        if (!res.ok) {
+          setSearchResults([])
+          return
+        }
+        const data: any[] = await res.json()
+        const mapped = data.map((item) => {
+          const city =
+            item.address?.city ||
+            item.address?.town ||
+            item.address?.village ||
+            ''
+          const country = item.address?.country || ''
+          const label = [city, country].filter(Boolean).join(', ') || item.display_name
+          return {
+            label,
+            value: label,
+          }
+        })
+        setSearchResults(mapped)
+        setSearchOpen(true)
+      } catch (err) {
+        if ((err as any).name !== 'AbortError') {
+          console.error('Location search failed', err)
+        }
+        setSearchResults([])
+      } finally {
+        setSearchLoading(false)
+      }
+    }, 300)
+
+    return () => {
+      controller.abort()
+      clearTimeout(timeoutId)
+    }
+  }, [searchQuery, language])
+
+  const handleSelectLocation = (value: string) => {
+    const slug = encodeURIComponent(value)
+    setSearchQuery('')
+    setSearchResults([])
+    setSearchOpen(false)
+    router.push(`/destination/${slug}`)
+  }
 
   const navLinks = [
     { href: '/about', labelKey: 'nav.about' },
@@ -79,8 +152,40 @@ export function Navbar() {
               ))}
             </nav>
 
-            {/* Right - Language & Auth */}
+            {/* Right - Search, Language & Auth */}
             <div className="flex items-center gap-2 md:gap-3">
+              {/* Location Search */}
+              <div className="relative hidden md:block">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 focus-within:bg-white/20 transition-colors">
+                  <Search className="w-4 h-4 text-white/80" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder={t('destinations.searchPlaceholder') ?? 'Search a city or country'}
+                    className="bg-transparent text-xs text-white placeholder:text-white/60 focus:outline-none w-40"
+                  />
+                </div>
+                {searchOpen && searchResults.length > 0 && (
+                  <div className="absolute mt-1 w-full max-w-xs bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden z-[60]">
+                    {searchResults.map((item) => (
+                      <button
+                        key={item.value}
+                        type="button"
+                        onClick={() => handleSelectLocation(item.value)}
+                        className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {searchLoading && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-white/80">
+                    …
+                  </div>
+                )}
+              </div>
               {/* Language Selector */}
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
@@ -116,12 +221,31 @@ export function Navbar() {
                         }`}
                         data-testid={`lang-option-${lang.code}`}
                       >
-                        <img 
-                          src={lang.flag} 
-                          alt={`${lang.name} flag`}
-                          className="w-5 h-5 rounded-full object-cover"
-                          loading="lazy"
-                        />
+                        {lang.code === 'pt' ? (
+                          <span className="relative w-5 h-5 rounded-full overflow-hidden border border-slate-200">
+                            <span
+                              className="absolute inset-y-0 left-0 w-1/2 bg-cover bg-center"
+                              style={{
+                                backgroundImage:
+                                  "url('https://cdn-icons-png.flaticon.com/512/197/197463.png')",
+                              }}
+                            />
+                            <span
+                              className="absolute inset-y-0 right-0 w-1/2 bg-cover bg-center"
+                              style={{
+                                backgroundImage:
+                                  "url('https://cdn-icons-png.flaticon.com/512/197/197386.png')",
+                              }}
+                            />
+                          </span>
+                        ) : (
+                          <img 
+                            src={lang.flag} 
+                            alt={`${lang.name} flag`}
+                            className="w-5 h-5 rounded-full object-cover"
+                            loading="lazy"
+                          />
+                        )}
                         <span className="font-medium">{lang.name}</span>
                         {language === lang.code && (
                           <span className="ml-auto text-brand">✓</span>

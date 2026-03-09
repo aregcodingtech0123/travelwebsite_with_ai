@@ -101,11 +101,11 @@ export function Footer() {
             </ul>
             
             <a 
-              href="mailto:contact@ai-traveller-planner.example.com"
+              href="mailto:contact@aeroute.example.com"
               className="inline-flex items-center gap-2 text-white/80 hover:text-white text-sm transition-colors font-body"
             >
               <Mail className="w-4 h-4" />
-              <span>contact@ai-traveller-planner.example.com</span>
+              <span>contact@aeroute.example.com</span>
             </a>
           </div>
         </div>

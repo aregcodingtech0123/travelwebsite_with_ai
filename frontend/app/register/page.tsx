@@ -10,11 +10,17 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
 
 export default function RegisterPage() {
   const { t } = useLanguage()
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [hasUppercase, setHasUppercase] = useState(false)
+  const [hasNumber, setHasNumber] = useState(false)
+  const [hasSymbol, setHasSymbol] = useState(false)
+  const [acceptedPolicy, setAcceptedPolicy] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,11 +35,15 @@ export default function RegisterPage() {
       const res = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, name: '', surname: '' }),
+        body: JSON.stringify({ email, password, firstName, lastName }),
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
-        setError(data.error ?? t('register.error.failed'))
+        if (res.status === 409) {
+          setError(t('register.error.emailExists'))
+        } else {
+          setError(data.error ?? t('register.error.failed'))
+        }
         return
       }
       const signInRes = await signIn('credentials', { email, password, redirect: false })
@@ -64,16 +74,52 @@ export default function RegisterPage() {
           className="text-3xl font-bold text-center mb-8 text-brand"
           data-testid="register-title"
         >
-          {t('register.title')}
+          {t('auth.register.title')}
         </h1>
         
         <form onSubmit={handleSubmit} className="space-y-6" data-testid="register-form">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label
+                htmlFor="firstName"
+                className="block text-sm font-medium text-slate-700 mb-2"
+              >
+                {t('auth.firstName')}
+              </label>
+              <input
+                id="firstName"
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required
+                className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand focus:border-transparent transition-all"
+                data-testid="register-firstname-input"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="lastName"
+                className="block text-sm font-medium text-slate-700 mb-2"
+              >
+                {t('auth.lastName')}
+              </label>
+              <input
+                id="lastName"
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                required
+                className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand focus:border-transparent transition-all"
+                data-testid="register-lastname-input"
+              />
+            </div>
+          </div>
           <div>
             <label 
               htmlFor="email" 
               className="block text-sm font-medium text-slate-700 mb-2"
             >
-              {t('register.email')}
+              {t('auth.email')}
             </label>
             <input
               id="email"
@@ -82,7 +128,7 @@ export default function RegisterPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand focus:border-transparent transition-all"
-              placeholder={t('register.email.placeholder')}
+              placeholder={t('auth.placeholders.email')}
               data-testid="register-email-input"
             />
           </div>
@@ -92,18 +138,47 @@ export default function RegisterPage() {
               htmlFor="password" 
               className="block text-sm font-medium text-slate-700 mb-2"
             >
-              {t('register.password')}
+              {t('auth.password')}
             </label>
             <input
               id="password"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value
+                setPassword(val)
+                setHasUppercase(/[A-Z]/.test(val))
+                setHasNumber(/[0-9]/.test(val))
+                setHasSymbol(/[!@#$%^&*(),.?":{}|<>]/.test(val))
+              }}
               required
               className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-brand focus:border-transparent transition-all"
-              placeholder={t('register.password.placeholder')}
+              placeholder={t('auth.placeholders.password')}
               data-testid="register-password-input"
             />
+            <ul className="mt-2 text-xs space-y-1">
+              <li
+                className={
+                  hasUppercase ? 'text-emerald-600' : 'text-slate-500'
+                }
+              >
+                {hasUppercase ? '✓' : '•'} {t('auth.rules.uppercase')}
+              </li>
+              <li
+                className={
+                  hasNumber ? 'text-emerald-600' : 'text-slate-500'
+                }
+              >
+                {hasNumber ? '✓' : '•'} {t('auth.rules.number')}
+              </li>
+              <li
+                className={
+                  hasSymbol ? 'text-emerald-600' : 'text-slate-500'
+                }
+              >
+                {hasSymbol ? '✓' : '•'} {t('auth.rules.symbol')}
+              </li>
+            </ul>
           </div>
           
           <div>
@@ -131,13 +206,32 @@ export default function RegisterPage() {
             </p>
           )}
           
+          <div className="flex items-start gap-2 text-xs text-slate-600">
+            <input
+              id="policyAccepted"
+              type="checkbox"
+              checked={acceptedPolicy}
+              onChange={(e) => setAcceptedPolicy(e.target.checked)}
+              className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand focus:ring-brand"
+            />
+            <label htmlFor="policyAccepted" className="cursor-pointer">
+              {t('register.policyText')}
+            </label>
+          </div>
+          
           <button
             type="submit"
-            disabled={loading}
+            disabled={
+              loading ||
+              !hasUppercase ||
+              !hasNumber ||
+              !hasSymbol ||
+              !acceptedPolicy
+            }
             className="w-full py-3.5 rounded-xl font-semibold text-white bg-brand hover:bg-brand/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             data-testid="register-submit-button"
-          >
-            {loading ? t('register.loading') : t('register.submit')}
+            >
+              {loading ? t('register.loading') : t('register.submit')}
           </button>
           
           <button

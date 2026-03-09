@@ -63,7 +63,7 @@ export const HeroSection = ({
     <section 
       className="relative min-h-[90vh] md:min-h-[85vh] flex items-center justify-center overflow-hidden"
       data-testid="hero-section"
-      aria-label="Hero section"
+      aria-label={t('hero.ariaLabel')}
     >
       {/* Full Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
@@ -81,7 +81,7 @@ export const HeroSection = ({
         ) : (
           <img 
             src={backgroundSrc} 
-            alt="Beautiful travel destination showcasing world exploration" 
+            alt={t('hero.backgroundAlt')} 
             className="w-full h-full object-cover"
             loading="eager"
           />

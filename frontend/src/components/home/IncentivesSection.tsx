@@ -17,7 +17,7 @@ export function IncentivesSection() {
     <section 
       className="py-24 md:py-32 px-6 md:px-12 lg:px-16 bg-white"
       data-testid="incentives-section"
-      aria-label="Why choose us"
+      aria-label={t('incentives.title')}
     >
       <div className="max-w-7xl mx-auto">
         <header className="text-center mb-16 md:mb-20">

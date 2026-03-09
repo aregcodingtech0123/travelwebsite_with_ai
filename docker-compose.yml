@@ -65,18 +65,21 @@ services:
     ports:
       - "3000:3000"
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
+      HOSTNAME: 0.0.0.0
+      PORT: 3000
       NEXT_PUBLIC_API_URL: "http://localhost:8080"
       BACKEND_URL: "http://backend:8080"
+      NEXTAUTH_SECRET: "local-dev-nextauth-secret-please-change-in-prod-1234567890"
+      NEXTAUTH_URL: "http://localhost:3000"
     depends_on:
       - backend
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      - /app/.next
-    command: npm run dev
-    tty: true
-    stdin_open: true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
 volumes:
   postgres_data:

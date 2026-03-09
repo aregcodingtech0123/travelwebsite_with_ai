@@ -29,14 +29,15 @@ export const PopularDestinations = ({ language, t }: PopularDestinationsProps) =
   }
 
   const handleDestinationClick = (slug: string) => {
-    window.location.href = `/destinations/${slug}`
+    // Route to dynamic destination page
+    window.location.href = `/destination/${encodeURIComponent(slug)}`
   }
 
   return (
     <section 
       className="relative py-24 md:py-32 px-6 md:px-12 lg:px-16 bg-professional"
       data-testid="popular-destinations-section"
-      aria-label="Popular destinations"
+      aria-label={t('destinations.popular.title')}
     >
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
@@ -78,7 +79,7 @@ export const PopularDestinations = ({ language, t }: PopularDestinationsProps) =
                 data-testid={`destination-card-${destination.id}`}
                 role="button"
                 tabIndex={0}
-                aria-label={`Explore ${destination.name}`}
+                aria-label={`${t('destinations.popular.card.' + destination.id)}`}
               >
                 {/* Background Image */}
                 <div 
@@ -100,7 +101,7 @@ export const PopularDestinations = ({ language, t }: PopularDestinationsProps) =
                     {destination.name}
                   </h3>
                   <p className="font-body text-base md:text-lg text-white/90 leading-relaxed opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-24 transition-all duration-500 overflow-hidden">
-                    {destination.description}
+                    {t('destinations.popular.card.' + destination.id) || destination.description}
                   </p>
                   
                   {/* Animated line on hover */}

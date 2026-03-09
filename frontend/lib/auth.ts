@@ -16,29 +16,73 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null
-        // Call your backend to validate credentials and return user
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'}/api/auth/login`, {
+
+        // Use internal Docker network URL on the server, fall back to public URL or localhost
+        const backendBaseUrl =
+          process.env.BACKEND_URL ??
+          process.env.NEXT_PUBLIC_API_URL ??
+          'http://localhost:8080'
+
+        const res = await fetch(`${backendBaseUrl}/api/auth/login`, {
           method: 'POST',
-          body: JSON.stringify({ email: credentials.email, password: credentials.password }),
           headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: credentials.email,
+            password: credentials.password,
+          }),
         })
-        if (!res.ok) return null
+
+        if (!res.ok) {
+          // Invalid credentials or backend error
+          return null
+        }
+
         const data = await res.json()
-        return { id: data.id, email: data.email, name: data.name ?? '' }
+        if (!data?.id || !data?.email) {
+          return null
+        }
+
+        return {
+          id: data.id,
+          email: data.email,
+          name: data.name ?? '',
+        }
       },
     }),
   ],
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === 'google' && user.email) {
-        // Optional: sync Google user to your DB via backend
+        // Sync Google user to backend database
+        try {
+          const backendBaseUrl =
+            process.env.BACKEND_URL ??
+            process.env.NEXT_PUBLIC_API_URL ??
+            'http://localhost:8080'
+
+          const name = user.name ?? ''
+          const [firstName, ...rest] = name.split(' ')
+          const lastName = rest.join(' ').trim() || undefined
+
+          await fetch(`${backendBaseUrl}/api/auth/oauth/google`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: user.email,
+              firstName: firstName || undefined,
+              lastName,
+            }),
+          })
+        } catch (err) {
+          console.error('Failed to sync Google user to backend:', err)
+        }
         return true
       }
       return true
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as { id?: string }).id = token.sub ?? undefined
+        ;(session.user as { id?: string }).id = token.sub ?? undefined
       }
       return session
     },
@@ -52,4 +96,5 @@ export const authOptions: NextAuthOptions = {
   },
   session: { strategy: 'jwt', maxAge: 30 * 24 * 60 * 60 },
   secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NEXTAUTH_DEBUG === 'true',
 }

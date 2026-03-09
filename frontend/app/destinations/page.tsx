@@ -36,7 +36,9 @@ export default function DestinationsPage() {
               <h2 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-brand transition-colors">
                 {d.name}
               </h2>
-              <p className="text-slate-600 text-sm">{d.description}</p>
+              <p className="text-slate-600 text-sm">
+                {t('destinations.cards.' + d.id) || t('destinations.popular.card.' + d.id) || d.description}
+              </p>
             </div>
           </Link>
         ))}
